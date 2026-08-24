@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, Image, TextInput, TouchableOpacity, Alert } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import Animated, { FadeInUp, FadeInDown } from "react-native-reanimated";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
@@ -22,12 +22,16 @@ function LoginScreen() {
             const result = await authService.login(email, password);
 
             // Store JWT securely
-            await SecureStore.setItemAsync("token", result.token);
-
-            // Go to Home
-            navigation.navigate("Home");
+            if (result.token) {
+                await SecureStore.setItemAsync("token", result.token);
+                Alert.alert("Login successful", "You have been logged in successfully");
+                navigation.navigate("Home");
+            }
         } catch (error) {
             console.log(error);
+            if (error instanceof Error) {
+                Alert.alert("Login failed", error.message);
+            }
         }
     };
 

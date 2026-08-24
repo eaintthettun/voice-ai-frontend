@@ -1,8 +1,5 @@
-import * as SecureStore from "expo-secure-store";
-const API_URL = "http://192.168.1.8:3000";
+const API_URL = "http://192.168.1.7:3000";
 
-
-const token = await SecureStore.getItemAsync("token");
 
 const login = async (email: string, password: string) => {
   const response = await fetch(`${API_URL}/api/auth/login`, {

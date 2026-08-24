@@ -1,4 +1,4 @@
-import { View,Text,Image, TextInput, TouchableOpacity } from "react-native";
+import { View,Text,Image, TextInput, TouchableOpacity, Alert } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import Animated,{ FadeInUp,FadeInDown } from "react-native-reanimated";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
@@ -20,10 +20,16 @@ function SignUpScreen() {
           try {
               const result = await authService.register(username, email, password);
   
-  
-              // result.token contains your JWT
+              if(result.message==="User registered successfully") {
+                  Alert.alert("Sign Up successful", "You have been registered successfully");
+                  navigation.navigate("Login");
+              }
+
           } catch (error) {
               console.log(error);
+               if (error instanceof Error) {
+                Alert.alert("Registration failed", error.message);
+            }
           }
       };
   
