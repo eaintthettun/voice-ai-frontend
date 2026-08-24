@@ -1,11 +1,10 @@
-import { View, Text } from "react-native";
-import "./global.css";
+import * as React from 'react';
+import { createStaticNavigation } from '@react-navigation/native';
+import RootStack from './navigation';
+import './global.css';
+
+const Navigation = createStaticNavigation(RootStack);
 
 export default function App() {
-  return (
-    <View>
-      <Text className="bg-blue-500 text-3xl">Hello world</Text>
-    </View>
-  );
+  return <Navigation />;
 }
- 
