@@ -2,6 +2,8 @@ import { View,Text,Image, TextInput, TouchableOpacity } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import Animated,{ FadeInUp,FadeInDown } from "react-native-reanimated";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { useState } from "react";
+import authService from "../services/authService";
 
 type RootStackParamList = {
   Login: undefined;
@@ -10,6 +12,22 @@ type RootStackParamList = {
 
 function SignUpScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignUp = async () => {
+          try {
+              const result = await authService.register(username, email, password);
+  
+  
+              // result.token contains your JWT
+          } catch (error) {
+              console.log(error);
+          }
+      };
+  
+  
   return (
     <View className="bg-white h-full w-full">
       <StatusBar style="light" />
@@ -30,17 +48,33 @@ function SignUpScreen() {
         {/* form */}
         <View className="flex items-center mx-4 spacy-y-4">
             <Animated.View entering={FadeInDown.duration(1000).springify()} className="bg-black/5 p-3 rounded-2xl w-full">
-                <TextInput placeholder="Username" placeholderTextColor={'gray'}/>
+                <TextInput
+                    placeholder="Username"
+                    placeholderTextColor={'gray'}
+                    value={username}
+                    onChangeText={setUsername}
+                />
             </Animated.View>
             <Animated.View entering={FadeInDown.delay(200).duration(1000).springify()} className="bg-black/5 p-3 rounded-2xl w-full mt-3">
-                <TextInput placeholder="Email" placeholderTextColor={'gray'}/>
+                <TextInput
+                    placeholder="Email"
+                    placeholderTextColor={'gray'}
+                    value={email}
+                    onChangeText={setEmail}
+                />
             </Animated.View>
             <Animated.View entering={FadeInDown.delay(400).duration(1000).springify()} className="bg-black/5 p-3 rounded-2xl w-full mt-3 mb-5">
-                <TextInput placeholder="Password" secureTextEntry placeholderTextColor={'gray'}/>
+                <TextInput
+                    placeholder="Password"
+                    secureTextEntry
+                    placeholderTextColor={'gray'}
+                    value={password}
+                    onChangeText={setPassword}
+                />
             </Animated.View>
             {/* button */}
             <Animated.View  entering={FadeInDown.delay(600).duration(1000).springify()} className="w-full">
-                <TouchableOpacity className="w-full bg-sky-400 p-3 rounded-2xl mb-4">
+                <TouchableOpacity className="w-full bg-sky-400 p-3 rounded-2xl mb-4" onPress={handleSignUp}>
                     <Text className="text-xl font-bold text-white text-center">Sign Up</Text>
                 </TouchableOpacity>
             </Animated.View>
