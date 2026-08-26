@@ -1,10 +1,17 @@
-import * as React from 'react';
-import { createStaticNavigation } from '@react-navigation/native';
-import RootStack from './navigation';
-import './global.css';
+import { NavigationContainer } from "@react-navigation/native";
 
-const Navigation = createStaticNavigation(RootStack);
+import "./global.css";
 
+import { AuthProvider } from "./context/AuthContext";
+import RootNavigator from "./navigation/RootNavigator";
+
+//hello
 export default function App() {
-  return <Navigation />;
+  return (
+    <AuthProvider>
+      <NavigationContainer>
+        <RootNavigator />
+      </NavigationContainer>
+    </AuthProvider>
+  );
 }

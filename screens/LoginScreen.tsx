@@ -4,18 +4,19 @@ import Animated, { FadeInUp, FadeInDown } from "react-native-reanimated";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import authService from "../services/authService";
-import * as SecureStore from "expo-secure-store";
+import { useAuth } from "../context/AuthContext";
 
 type RootStackParamList = {
     Login: undefined;
     SignUp: undefined;
-    Home: undefined;
+    Main: undefined;
 };
 
 function LoginScreen() {
-    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const navigation=useNavigation<NavigationProp<RootStackParamList>>();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const { login } = useAuth();
 
     const handleLogin = async () => {
         try {
@@ -23,9 +24,9 @@ function LoginScreen() {
 
             // Store JWT securely
             if (result.token) {
-                await SecureStore.setItemAsync("token", result.token);
+                await login(result.token);
                 Alert.alert("Login successful", "You have been logged in successfully");
-                navigation.navigate("Home");
+                navigation.navigate("Main");
             }
         } catch (error) {
             console.log(error);
