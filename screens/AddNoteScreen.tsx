@@ -1,5 +1,13 @@
-import { Text, View, Image, TextInput, Button, TouchableOpacity, Alert } from "react-native";
-import { colors } from '../theme'
+import {
+  Text,
+  View,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ScrollView,
+} from "react-native";
+import { colors } from "../theme";
 import RecordAudioButton from "../components/RecordAudioButton";
 import { useState } from "react";
 import diaryEntryService from "../services/diaryEntryService";
@@ -14,89 +22,143 @@ export default function AddNoteScreen() {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [audioUri, setAudioUri] = useState("");
-  const [filePath,setFilePath]= useState("");
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [filePath, setFilePath] = useState("");
+
+  const navigation =
+    useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleTranscribe = async () => {
-    const result = await diaryEntryService.transcribeDiaryEntry(title, audioUri);
+    try {
+      const result = await diaryEntryService.transcribeDiaryEntry(
+        title,
+        audioUri
+      );
 
-    if(result){
-      setTranscript(result.transcript)
-      setCategory(result.category)
-      setFilePath(result.filePath);
+      if (result) {
+        setTranscript(result.transcript);
+        setCategory(result.category);
+        setFilePath(result.filePath);
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to transcribe recording.");
     }
   };
 
   const handleCreate = async () => {
-    const result = await diaryEntryService.createDiaryEntry
-    (title, transcript,category,filePath);
+    try {
+      const result = await diaryEntryService.createDiaryEntry(
+        title,
+        transcript,
+        category,
+        filePath
+      );
 
-    if(result){
-       Alert.alert("Diary Entry Created Successfully")
-       navigation.navigate("DiaryList")
-    };
-    
-  }
+      if (result) {
+        Alert.alert("Success", "Diary entry created successfully.");
+        navigation.navigate("DiaryList");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Failed to create diary entry.");
+    }
+  };
 
   return (
-    <View className="flex-1 mx-4 mt-4 justify-between">
+    <ScrollView
+      className="flex-1 my-10 p-3"
+      contentContainerStyle={{
+        paddingBottom: 30,
+      }}
+      showsVerticalScrollIndicator={false}
+    >
 
-      {/* Top + form */}
-      <View>
-        <Text
-          className={`${colors.heading} text-xl font-bold text-center`}
-        >
-          Add Diary Entry
+      {/* Header */}
+      <Text
+        className={`${colors.heading} text-2xl font-bold text-center mb-4`}
+      >
+        Add Diary Entry
+      </Text>
+
+      {/* Illustration */}
+      <View className="items-center mb-4">
+        <Image
+          className="w-72 h-72"
+          source={require("../assets/addNotePhoto.png")}
+        />
+      </View>
+
+      {/* Title */}
+      <View className="mb-5">
+        <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+          Title
         </Text>
 
-        <View className="flex-row justify-center">
-          <Image
-            className="w-60 h-60"
-            source={require("../assets/addNotePhoto.png")}
-          />
-        </View>
+        <TextInput
+          className="bg-white px-5 py-4 rounded-2xl border border-gray-200"
+          placeholder="Enter diary title..."
+          value={title}
+          onChangeText={setTitle}
+        />
+      </View>
 
-        <View className="gap-2">
-          <Text className={`${colors.heading} text-lg font-bold`}>
-            Add Title
-          </Text>
+      {/* Recording */}
+      <View className="mb-5">
+        <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+          Recording
+        </Text>
 
-          <TextInput className="p-4 bg-white rounded-full mb-3" value={title} onChangeText={setTitle} />
-
-          <Text className={`${colors.heading} text-lg font-bold`}>
-            Add Recording
-          </Text>
-
+        <View className="bg-white rounded-2xl border border-gray-200 p-3">
           <RecordAudioButton
             onRecordingComplete={(uri) => setAudioUri(uri)}
           />
         </View>
       </View>
 
-      {/* Bottom button */}
-      <View className="mb-5">
+      {/* Transcribe Button */}
+      {audioUri !== "" && (
         <TouchableOpacity
-          className="w-full bg-sky-400 p-1 rounded-full"
+          className="bg-sky-500 py-4 rounded-2xl mb-5"
           onPress={handleTranscribe}
         >
-          <Text className="text-xl text-white text-center">
-            Transcribe and Predict
+          <Text className="text-white text-center text-lg font-semibold">
+            🎙️ Transcribe & Predict
           </Text>
         </TouchableOpacity>
-      </View>
+      )}
 
-      <View className="bg-gray-200 gap-2 mb-2">
-        <Text className={`${colors.heading} text-md font-bold`}>Transcript: {transcript}</Text>
-        <Text className={`${colors.heading} text-md font-bold`}>Category: {category}</Text>
-        <TouchableOpacity
-          className="w-full bg-blue-600 p-3 rounded-full"
-          onPress={handleCreate}
-        >
-          <Text className="text-xl text-white text-center">
-            Create
+      {/* Result */}
+      {transcript !== "" && (
+        <View className="bg-white rounded-2xl p-5 border border-gray-200 mb-5">
+
+          <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+            Transcript
           </Text>
-        </TouchableOpacity>
-      </View> 
-    </View>
+
+          <Text className="text-gray-600 mb-4">
+            {transcript}
+          </Text>
+
+          <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+            Category
+          </Text>
+
+          <View className="bg-sky-100 self-start px-4 py-2 rounded-full mb-5">
+            <Text className="text-sky-700 font-semibold">
+              {category}
+            </Text>
+          </View>
+
+          {/* Create */}
+          <TouchableOpacity
+            className="bg-blue-600 py-4 rounded-2xl"
+            onPress={handleCreate}
+          >
+            <Text className="text-white text-center text-lg font-semibold">
+              Create Diary
+            </Text>
+          </TouchableOpacity>
+
+        </View>
+      )}
+    </ScrollView>
   );
 }

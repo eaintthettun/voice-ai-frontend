@@ -10,6 +10,7 @@ import {
 import { File } from "expo-file-system";
 import { AudioPreview } from "../components/AudioPreview";
 import { colors } from '../theme'
+import { TouchableOpacity } from "react-native";
 
 interface RecordAudioButtonProps {
   onRecordingComplete: (uri: string) => void;
@@ -74,18 +75,17 @@ export default function RecordAudioButton({
 
   return (
     <View className={`${colors.button} justify-center p-2`} >
-      <Button
-        title={
-          recorderState.isRecording
-            ? "Stop recording"
-            : "Start recording"
-        }
-        onPress={
-          recorderState.isRecording
-            ? stopRecording
-            : record
-        }
-      />
+      <TouchableOpacity
+        className={`p-4 rounded-full ${recorderState.isRecording ? "bg-red-500" : "bg-sky-500"
+          }`}
+        onPress={recorderState.isRecording ? stopRecording : record}
+      >
+        <Text className="text-white text-center font-semibold text-lg">
+          {recorderState.isRecording
+            ? "⏹ Stop Recording"
+            : "🎙️ Start Recording"}
+        </Text>
+      </TouchableOpacity>
 
       {audioUri && (
         <AudioPreview
