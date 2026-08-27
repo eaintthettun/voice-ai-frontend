@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
+import { Alert } from "react-native";
 
 type AuthContextType = {
   token: string | null;
@@ -28,14 +29,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Called after successful login
   const login = async (newToken: string) => {
+    Alert.alert("Login successful", "You have been logged in successfully");
     await SecureStore.setItemAsync("token", newToken);
     setToken(newToken);
   };
 
   // Called when user logs out
   const logout = async () => {
-    await SecureStore.deleteItemAsync("token");
-    setToken(null);
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
+        {
+          text: "Logout",
+          onPress: async () => {
+            await SecureStore.deleteItemAsync("token");
+            setToken(null);
+          }
+        }
+      ]
+    );
   };
 
   return (

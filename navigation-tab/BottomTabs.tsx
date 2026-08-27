@@ -6,6 +6,7 @@ import AddNoteScreen from "../screens/AddNoteScreen";
 import CategoriesScreen from "../screens/CategoriesScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import { Ionicons } from "@expo/vector-icons";
+import DiaryList from "../screens/DiaryList";
 
 
 const Tab = createBottomTabNavigator();

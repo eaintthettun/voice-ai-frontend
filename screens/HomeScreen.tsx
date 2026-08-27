@@ -2,17 +2,25 @@ import { View, Text, TouchableOpacity, Image, FlatList } from "react-native";
 import { colors } from '../theme'
 import { useEffect, useState } from "react";
 import diaryEntryService from "../services/diaryEntryService";
+import { useAuth } from "../context/AuthContext";
+import { useNavigation,NavigationProp } from "@react-navigation/native";
 
 interface DiaryEntry {
-  _id: string;
+  id: string;
   title: string;
   transcript: string;
   category: string;
   createdAt: string;
 }
 
+type RootStackParamList = {
+    DiaryList: undefined;
+};
+
 export default function HomeScreen() {
   const [recentDiaries, setRecentDiaries] = useState<DiaryEntry[]>();
+  const {logout}=useAuth();
+  const navigation=useNavigation<NavigationProp<RootStackParamList>>();
 
   useEffect(() => {
     const fetchDiaries = async () => {
@@ -26,13 +34,16 @@ export default function HomeScreen() {
 
     fetchDiaries();
   }, []);
-  console.log(recentDiaries)
+  
+  const handleViewAll = () => {
+    navigation.navigate("DiaryList");
+  };
 
   return (
     <View className="flex-1">
       <View className="flex-row justify-between items-center px-4 my-10">
         <Text className={`${colors.heading} font-bold text-3xl shadow-sm`}>DevDiary </Text>
-        <TouchableOpacity className="p-2 px-3 bg-white border border-gray rounded-full">
+        <TouchableOpacity className="p-2 px-3 bg-white border border-gray rounded-full" onPress={logout}>
           <Text className={colors.heading}>Logout</Text>
         </TouchableOpacity>
       </View>
@@ -42,7 +53,7 @@ export default function HomeScreen() {
       <View className="px-4 my-10">
         <View className="flex-row justify-between items-center">
           <Text className={`${colors.heading} font-bold text-xl`}>Recent Notes</Text>
-          <TouchableOpacity className="p-2 px-2 bg-white border border-gray rounded-full">
+          <TouchableOpacity className="p-2 px-2 bg-white border border-gray rounded-full" onPress={handleViewAll}>
             <Text>View all</Text>
           </TouchableOpacity>
         </View>
@@ -50,7 +61,7 @@ export default function HomeScreen() {
           <FlatList
             data={recentDiaries}
             numColumns={1}
-            keyExtractor={item => item._id}
+            keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
             renderItem={
               ({ item }) => {

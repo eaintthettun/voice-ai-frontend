@@ -7,9 +7,7 @@ import authService from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 
 type RootStackParamList = {
-    Login: undefined;
     SignUp: undefined;
-    Main: undefined;
 };
 
 function LoginScreen() {
@@ -25,8 +23,6 @@ function LoginScreen() {
             // Store JWT securely
             if (result.token) {
                 await login(result.token);
-                Alert.alert("Login successful", "You have been logged in successfully");
-                navigation.navigate("Main");
             }
         } catch (error) {
             console.log(error);
