@@ -7,6 +7,7 @@ import SignUpScreen from "../screens/SignUpScreen";
 import { useAuth } from "../context/AuthContext";
 import DiaryList from "../screens/DiaryList";
 import EditNoteScreen from "../screens/EditNoteScreen";
+import { DiaryEntryDetailScreen } from "../screens/DiaryEntryDetailScreen";
 
 type RootStackParamList = {
   Main: undefined;
@@ -19,9 +20,14 @@ type RootStackParamList = {
     category: string;
   };
 
+  DiaryDetail: {
+    id:string;
+  };
+
   Login: undefined;
   SignUp: undefined;
 };
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function RootNavigator() {
@@ -38,6 +44,7 @@ export default function RootNavigator() {
           <Stack.Screen name="Main" component={BottomTabs} />
           <Stack.Screen name="DiaryList" component={DiaryList} />
           <Stack.Screen name="EditDiary" component={EditNoteScreen} />
+          <Stack.Screen name="DiaryDetail" component={DiaryEntryDetailScreen} />
         </>
       ) : (
         <>

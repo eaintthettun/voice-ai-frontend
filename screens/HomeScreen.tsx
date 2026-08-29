@@ -106,7 +106,15 @@ export default function HomeScreen() {
             </Text>
 
             <Text className="text-gray-500 text-sm">
-              Date: {new Date(item.createdAt).toDateString()}
+              Date: {item.createdAt
+                        ? new Date(item.createdAt).toLocaleString("en-US", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                        })
+                        : "Loading..."}
             </Text>
           </View>
         </TouchableOpacity>

@@ -1,7 +1,8 @@
-import { Image, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { Alert, Image, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { colors } from "../theme";
 import { useState } from "react";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { NavigationProp, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import diaryEntryService from "../services/diaryEntryService";
 
 
 type RootStackParamList = {
@@ -11,12 +12,16 @@ type RootStackParamList = {
         transcript: string;
         category: string;
     };
+    DiaryDetail: {
+        id:string
+    }
 };
 
 type EditDiaryRouteProp = RouteProp<
     RootStackParamList,
     "EditDiary"
 >;
+
 
 export default function EditNoteScreen() {
     const route = useRoute<EditDiaryRouteProp>();
@@ -28,13 +33,21 @@ export default function EditNoteScreen() {
         category,
     } = route.params;
 
+    console.log("id in edit screen:",id)
+
 
     const [editedTranscript, setEditedTranscript] = useState(transcript);
     const [editedCategory, setEditedCategory] = useState(category);
     const [editedTitle, setEditedTitle] = useState(title);
+    const navigation=useNavigation<NavigationProp<RootStackParamList>>();
 
-    const handleSave = () => {
-        console.log('save method');
+    const handleUpdate=async () => {
+        const result=await diaryEntryService.updateDiaryEntry(id,editedTitle,editedTranscript)
+
+        if(result.message == "Edited diary entry successfully"){
+            Alert.alert("Updated successfully");
+            navigation.navigate("DiaryDetail",{id:id})
+        }
     }
 
     return (
@@ -84,7 +97,7 @@ export default function EditNoteScreen() {
             </View>
             <TouchableOpacity
                 className="bg-blue-600 py-4 rounded-2xl"
-                onPress={handleSave}
+                onPress={handleUpdate}
             >
                 <Text className="text-white text-center text-lg font-semibold">
                     Save Diary
