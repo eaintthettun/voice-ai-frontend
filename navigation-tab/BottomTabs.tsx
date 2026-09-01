@@ -1,7 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import HomeScreen from "../screens/HomeScreen";
-import NotesScreen from "../screens/NotesScreen";
 import AddNoteScreen from "../screens/AddNoteScreen";
 import CategoriesScreen from "../screens/CategoriesScreen";
 import ProfileScreen from "../screens/ProfileScreen";
@@ -25,10 +24,10 @@ export default function BottomTabs() {
             <Ionicons name="home-outline" size={size} color={color} />
           ),
         }} />
-      <Tab.Screen name="Notes" component={NotesScreen}
+      <Tab.Screen name="Diary" component={DiaryList}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="document-text-outline" size={size} color={color} />
+            <Ionicons name="book-outline" size={size} color={color} />
           ),
         }} />
       <Tab.Screen name="Add" component={AddNoteScreen}

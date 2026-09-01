@@ -15,6 +15,9 @@ interface DiaryEntry {
 
 type RootStackParamList = {
   DiaryList: undefined;
+  DiaryDetail: {
+    id:string
+  }
 };
 
 export default function HomeScreen() {
@@ -50,9 +53,9 @@ export default function HomeScreen() {
           {/* Header */}
           <View className="flex-row justify-between items-center px-4 my-10">
             <Text
-              className={`${colors.heading} font-bold text-3xl shadow-sm`}
+              className={`${colors.heading} font-bold text-2xl shadow-sm`}
             >
-              DevDiary 
+               DevDiary
             </Text>
 
             <TouchableOpacity
@@ -91,7 +94,9 @@ export default function HomeScreen() {
         </>
       }
       renderItem={({ item }) => (
-        <TouchableOpacity className="bg-blue-100 mx-6 mb-3 p-3 rounded-xl shadow-md">
+        <TouchableOpacity 
+        className="bg-blue-100 mx-6 mb-3 p-3 rounded-xl shadow-md"
+        onPress={() => navigation.navigate("DiaryDetail", { id: item.id })}>
           <View className="gap-2">
             <Text className="font-bold text-lg">
               {item.title}

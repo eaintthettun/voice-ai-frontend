@@ -12,6 +12,7 @@ import RecordAudioButton from "../components/RecordAudioButton";
 import { useState } from "react";
 import diaryEntryService from "../services/diaryEntryService";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type RootStackParamList = {
   DiaryList: undefined;
@@ -23,16 +24,20 @@ export default function AddNoteScreen() {
   const [title, setTitle] = useState("");
   const [audioUri, setAudioUri] = useState("");
   const [filePath, setFilePath] = useState("");
+  const [isTranscribing,setIsTranscribing]=useState(false);
+  const { top } = useSafeAreaInsets();
 
   const navigation =
     useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleTranscribe = async () => {
     try {
+      setIsTranscribing(true);
       const result = await diaryEntryService.transcribeDiaryEntry(
         title,
         audioUri
       );
+      setIsTranscribing(false);
 
       if (result) {
         setTranscript(result.transcript);
@@ -64,7 +69,7 @@ export default function AddNoteScreen() {
 
   return (
     <ScrollView
-      className="flex-1 my-10 p-3"
+      className="flex-1"
       contentContainerStyle={{
         paddingBottom: 30,
       }}
@@ -73,7 +78,8 @@ export default function AddNoteScreen() {
 
       {/* Header */}
       <Text
-        className={`${colors.heading} text-2xl font-bold text-center mb-4`}
+        style={{paddingTop:top}} 
+        className={`text-white p-4 text-2xl font-bold text-center mb-4 bg-sky-600 rounded-3xl`}
       >
         Add Diary Entry
       </Text>
@@ -88,12 +94,12 @@ export default function AddNoteScreen() {
 
       {/* Title */}
       <View className="mb-5">
-        <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+        <Text className={`${colors.heading} text-base font-semibold mb-2 mx-4`}>
           Title
         </Text>
 
         <TextInput
-          className="bg-white px-5 py-4 rounded-2xl border border-gray-200"
+          className="bg-white px-5 py-4 rounded-2xl border border-gray-200 mx-4"
           placeholder="Enter diary title..."
           value={title}
           onChangeText={setTitle}
@@ -102,11 +108,11 @@ export default function AddNoteScreen() {
 
       {/* Recording */}
       <View className="mb-5">
-        <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+        <Text className={`${colors.heading} text-base font-semibold mb-2 mx-4`}>
           Recording
         </Text>
 
-        <View className="bg-white rounded-2xl border border-gray-200 p-3">
+        <View className="bg-white rounded-2xl border border-gray-200 p-3 mx-4">
           <RecordAudioButton
             onRecordingComplete={(uri) => setAudioUri(uri)}
           />
@@ -116,18 +122,19 @@ export default function AddNoteScreen() {
       {/* Transcribe Button */}
       {audioUri !== "" && (
         <TouchableOpacity
-          className="bg-sky-500 py-4 rounded-2xl mb-5"
+          className="bg-sky-500 py-4 rounded-2xl mb-5 mx-4"
           onPress={handleTranscribe}
+          disabled={isTranscribing}
         >
           <Text className="text-white text-center text-lg font-semibold">
-            🎙️ Transcribe & Predict
+            {isTranscribing ? "⏳ Transcribing..." : "🎙️ Transcribe & Predict"}
           </Text>
         </TouchableOpacity>
       )}
 
       {/* Result */}
       {transcript !== "" && (
-        <View className="bg-white rounded-2xl p-5 border border-gray-200 mb-5">
+        <View className="bg-white rounded-2xl p-5 border border-gray-200 mb-5  mx-2">
 
           <Text className={`${colors.heading} text-base font-semibold mb-2`}>
             Transcript

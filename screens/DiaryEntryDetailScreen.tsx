@@ -1,8 +1,10 @@
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react"
 import diaryEntryService from "../services/diaryEntryService";
-import { Image, Text, View } from "react-native"
+import { Image, Text, TouchableOpacity, View } from "react-native"
 import { colors } from "../theme";
+import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 //this is how we define props when working with react navigation
 type RootStackParamList = {
@@ -17,7 +19,9 @@ type DiaryRouteProp = RouteProp<
 >;
 
 export const DiaryEntryDetailScreen = () => {
+    const { top } = useSafeAreaInsets();
     const route = useRoute<DiaryRouteProp>();
+    const [menuVisible, setMenuVisible] = useState(false);
 
     const {
         id
@@ -28,6 +32,7 @@ export const DiaryEntryDetailScreen = () => {
     const [audio, setAudio] = useState("");
     const [transcript, setTranscript] = useState("");
     const [createdAt, setCreatedAt] = useState("");
+    const navigation = useNavigation()
 
     useEffect(() => {
         const fetchDiaryEntry = async () => {
@@ -45,13 +50,57 @@ export const DiaryEntryDetailScreen = () => {
         fetchDiaryEntry();
     });
 
+    const handleEdit = (id: string) => {
+        //navigation.navigate("EditDiary", { id })
+    }
+
+    const handleDelete = (id: string) => {
+
+    }
+
 
 
     return (
-        <View className="my-10 p-5">
-            <Text className={`${colors.heading} text-2xl font-bold text-center mb-4`}>
-                {title}
-            </Text>
+        <View className="flex -1">
+            <View style={{ paddingTop: top }} className="flex-row justify-between bg-sky-600 rounded-b-3xl p-3">
+                <TouchableOpacity className="mt-4 "onPress={() => navigation.goBack()}>
+                    <Ionicons
+                        name="arrow-back"
+                        size={20}
+                        color="#ffffff"
+                    />
+                </TouchableOpacity>
+                <Text className={`text-white text-2xl font-bold text-center mt-3`}>
+                    {title}
+                </Text>
+                <View>
+                    <TouchableOpacity className="mt-4 "onPress={() => setMenuVisible(!menuVisible)}>
+                        <Ionicons
+                            name="ellipsis-vertical"
+                            size={20}
+                            color="#ffffff"
+                        />
+                    </TouchableOpacity>
+
+                    {menuVisible && (
+                        <View className="absolute right-0 top-12 bg-white rounded-xl shadow-lg w-32">
+                            <TouchableOpacity
+                                className="px-4 py-3"
+                                onPress={() => handleEdit(id)}
+                            >
+                                <Text className="text-base">Edit</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                className="px-4 py-3"
+                                onPress={() => handleDelete(id)}
+                            >
+                                <Text className="text-base text-red-500">Delete</Text>
+                            </TouchableOpacity>
+                        </View>
+                    )}
+                </View>
+            </View>
             <View className="items-center mb-4">
                 <Image
                     className="w-72 h-72"
@@ -59,38 +108,38 @@ export const DiaryEntryDetailScreen = () => {
                 />
             </View>
             <View className="mb-5">
-                <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-2`}>
                     Category
                 </Text>
 
-                <Text className="bg-white px-5 py-4 rounded-2xl border border-gray-200">
+                <Text className="bg-white px-5 py-4 rounded-2xl border border-gray-200 mx-2">
                     {category}
                 </Text>
             </View>
             <View className="mb-5">
-                <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-2`}>
                     Transcript
                 </Text>
 
-                <Text className="bg-white px-5 py-4 rounded-2xl border border-gray-200">
+                <Text className="bg-white px-5 py-4 rounded-2xl border border-gray-200 mx-2">
                     {transcript}
                 </Text>
             </View>
             <View className="mb-5">
-                <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-2`}>
                     Audio
                 </Text>
 
-                <Text className="bg-gray-200 px-5 py-4 rounded-2xl">
+                <Text className="bg-gray-200 px-5 py-4 rounded-2xl mx-2">
                     {audio}
                 </Text>
             </View>
             <View className="mb-5">
-                <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-2`}>
                     Created At
                 </Text>
 
-                <Text className="bg-white px-5 py-4 rounded-2xl border border-gray-200">
+                <Text className="bg-white px-5 py-4 rounded-2xl border border-gray-200 mx-2">
                     {createdAt
                         ? new Date(createdAt).toLocaleString("en-US", {
                             day: "numeric",
