@@ -7,6 +7,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Categories from "../components/Categories";
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { NoData } from "../components/NoData";
+
 
 interface DiaryEntry {
   id: string;
@@ -32,11 +36,12 @@ type RootStackParamList = {
 const DiaryList = () => {
   const { top } = useSafeAreaInsets();
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingIcon, setLoadingIcon] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [loadingIcon, setLoadingIcon] = useState<boolean>(false);
   const navigation =
     useNavigation<NavigationProp<RootStackParamList>>();
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [activeFavorite, setActiveFavorite] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchDiaryEntriesByCategory = async (category: string) => {
@@ -44,22 +49,40 @@ const DiaryList = () => {
         if (category === "All") {
           setLoadingIcon(true);
           const data = await diaryEntryService.getAllDiaryEntries();
-          setLoadingIcon(false);
           setDiaryEntries(data.diaryEntries);
         } else {
           setLoadingIcon(true);
           const data = await diaryEntryService.getDiaryEntriesByCategory(category);
-          setLoadingIcon(false);
           setDiaryEntries(data.diaryEntries);
         }
       } catch (error) {
         console.error("Failed to fetch diary entries by category:", error);
       } finally {
-        setLoading(false);
+        setLoadingIcon(false);
       }
     };
-    fetchDiaryEntriesByCategory(activeCategory);
-  }, [activeCategory]);
+
+    const fetchFavoriteDiaryEntries = async () => {
+      try {
+        setLoadingIcon(true);
+        const data = await diaryEntryService.getFavoriteDiaryEntries();
+        setDiaryEntries(data.favoriteDiaryEntries);
+      } catch (error) {
+        console.error("Failed to fetch favorite diary entries:", error);
+      } finally {
+        setLoadingIcon(false);
+      }
+    }
+
+    //only call one api at a time
+    //when activeFavorite=true, call favorite diary entries api
+    //otherwise, call categorywise api
+    if (activeFavorite) {
+      fetchFavoriteDiaryEntries();
+    } else {
+      fetchDiaryEntriesByCategory(activeCategory);
+    }
+  }, [activeCategory, activeFavorite]);
 
   const handleLongPress = (item: DiaryEntry) => {
     Alert.alert(
@@ -111,6 +134,8 @@ const DiaryList = () => {
     return <LoadingScreen />;
   }
 
+  console.log("Diary Entries:", diaryEntries);
+
   return (
     <View className="flex-1">
       <View style={{ paddingTop: top }} className="flex-row items-center bg-sky-600 rounded-b-3xl p-3">
@@ -144,57 +169,82 @@ const DiaryList = () => {
         </View>
       </View>
       {/* Horizontal scroll bar for categories */}
-      <Categories activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
+      <View className="flex-row">
+        <Categories activeCategory={activeCategory}
+          setActiveCategory={setActiveCategory} setActiveFavorite={setActiveFavorite} />
+        {/* isFavorite button */}
+        <Animated.View
+          entering={FadeInDown.duration(500).springify()}
+          className="flex items-center gap-3 mt-3">
+          <TouchableOpacity
+            className={`rounded-full p-[13px] ${activeFavorite ? "bg-amber-300" : "bg-blue-100"
+              }`}
+            onPress={() => {
+              setActiveFavorite(true);
+              setActiveCategory("");
+            }}>
+            <MaterialIcons name="favorite-outline" color="#000" size={24} />
+          </TouchableOpacity>
+          <Text className="text-neutral-600" style={{ fontSize: hp(1.6) }}>Favorites</Text>
+        </Animated.View>
+      </View>
+
       {/* show loading icon when the api is fetching data */}
       {loadingIcon &&
         <View className="flex-1 justify-center items-center mt-4">
           <ActivityIndicator size="large" color="#0ea5e9" />
         </View>
       }
-      <FlatList
-        data={diaryEntries}
-        numColumns={1}
-        keyExtractor={item => item.id}
-        showsVerticalScrollIndicator={false}
-        renderItem={
-          ({ item }) => {
-            return (
-              <TouchableOpacity
-                className="bg-blue-100 m-4 rounded-xl shadow-md"
-                onLongPress={() => handleLongPress(item)}
-                onPress={() => navigation.navigate("DiaryDetail", { id: item.id })}>
-                <View className="flex-row items-center p-3">
-                  {/* Diary information */}
-                  <View className="flex-1 gap-2">
-                    <Text className="font-bold text-lg">
-                      {item.title}
-                    </Text>
+      {
+        diaryEntries.length > 0 ? (
+          <FlatList
+            data={diaryEntries}
+            numColumns={1}
+            keyExtractor={item => item.id}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 30 }}
+            renderItem={
+              ({ item }) => {
+                return (
+                  <TouchableOpacity
+                    className="bg-blue-100 m-4 rounded-xl shadow-md"
+                    onLongPress={() => handleLongPress(item)}
+                    onPress={() => navigation.navigate("DiaryDetail", { id: item.id })}>
+                    <View className="flex-row items-center p-3">
+                      {/* Diary information */}
+                      <View className="flex-1 gap-2">
+                        <Text className="font-bold text-lg">
+                          {item.title}
+                        </Text>
 
-                    <Text numberOfLines={2}>
-                      Transcript: {item.transcript}
-                    </Text>
+                        <Text numberOfLines={2}>
+                          Transcript: {item.transcript}
+                        </Text>
 
-                    <Text className="text-gray-500 text-sm">
-                      Category: {item.category}
-                    </Text>
+                        <Text className="text-gray-500 text-sm">
+                          Category: {item.category}
+                        </Text>
 
-                    <Text className="text-gray-500 text-sm">
-                      Date: {new Date(item.createdAt).toDateString()}
-                    </Text>
-                  </View>
+                        <Text className="text-gray-500 text-sm">
+                          Date: {new Date(item.createdAt).toDateString()}
+                        </Text>
+                      </View>
 
-                  {/* Arrow */}
-                  <Ionicons
-                    name="chevron-forward"
-                    size={24}
-                    color="#0ea5e9"
-                  />
+                      {/* Arrow */}
+                      <Ionicons
+                        name="chevron-forward"
+                        size={24}
+                        color="#0ea5e9"
+                      />
 
-                </View>
-              </TouchableOpacity>
-            )
-          }
-        } />
+                    </View>
+                  </TouchableOpacity>
+                )
+              }
+            }/>
+          ):
+          (<NoData />)
+      }
     </View>
   );
 };
