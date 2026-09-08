@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Alert, FlatList, Platform, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import LoadingScreen from "./LoadingScreen";
 import diaryEntryService from "../services/diaryEntryService";
-import { colors } from '../theme'
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
+import Categories from "../components/Categories";
 
 interface DiaryEntry {
   id: string;
@@ -27,27 +28,38 @@ type RootStackParamList = {
   }
 };
 
+
 const DiaryList = () => {
   const { top } = useSafeAreaInsets();
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingIcon, setLoadingIcon] = useState(true);
   const navigation =
     useNavigation<NavigationProp<RootStackParamList>>();
+  const [activeCategory, setActiveCategory] = useState("All");
 
   useEffect(() => {
-    const fetchDiaryEntries = async () => {
+    const fetchDiaryEntriesByCategory = async (category: string) => {
       try {
-        const result = await diaryEntryService.getAllDiaryEntries();
-        setDiaryEntries(result.diaryEntries);
+        if (category === "All") {
+          setLoadingIcon(true);
+          const data = await diaryEntryService.getAllDiaryEntries();
+          setLoadingIcon(false);
+          setDiaryEntries(data.diaryEntries);
+        } else {
+          setLoadingIcon(true);
+          const data = await diaryEntryService.getDiaryEntriesByCategory(category);
+          setLoadingIcon(false);
+          setDiaryEntries(data.diaryEntries);
+        }
       } catch (error) {
-        console.error("Failed to fetch diary entries:", error);
+        console.error("Failed to fetch diary entries by category:", error);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchDiaryEntries();
-  }, []);
+    fetchDiaryEntriesByCategory(activeCategory);
+  }, [activeCategory]);
 
   const handleLongPress = (item: DiaryEntry) => {
     Alert.alert(
@@ -119,6 +131,26 @@ const DiaryList = () => {
         <View className="flex-1">
         </View>
       </View>
+      {/* Search bar */}
+      <View className="mx-2 mt-2 flex-row items-center rounded-full bg-black/5 p-[6px]">
+        <TextInput
+          placeholder="Search any diary entry..."
+          placeholderTextColor={'gray'}
+          style={{ fontSize: hp(1.7) }}
+          className="flex-1 mb-1 pl-3 tracking-wider">
+        </TextInput>
+        <View className="bg-white rounded-full p-3">
+          <Feather name="search" color="#000" size={24} />
+        </View>
+      </View>
+      {/* Horizontal scroll bar for categories */}
+      <Categories activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
+      {/* show loading icon when the api is fetching data */}
+      {loadingIcon &&
+        <View className="flex-1 justify-center items-center mt-4">
+          <ActivityIndicator size="large" color="#0ea5e9" />
+        </View>
+      }
       <FlatList
         data={diaryEntries}
         numColumns={1}

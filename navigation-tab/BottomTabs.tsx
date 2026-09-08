@@ -6,7 +6,7 @@ import CategoriesScreen from "../screens/CategoriesScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import { Ionicons } from "@expo/vector-icons";
 import DiaryList from "../screens/DiaryList";
-
+import Feather from 'react-native-vector-icons/Feather';
 
 const Tab = createBottomTabNavigator();
 
@@ -40,10 +40,10 @@ export default function BottomTabs() {
             />
           ),
         }} />
-      <Tab.Screen name="Categories" component={CategoriesScreen}
+      <Tab.Screen name="Report" component={CategoriesScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="grid-outline" size={size} color={color} />
+             <Feather name="pie-chart" color={color} size={size} />
           ),
         }} />
       <Tab.Screen name="Profile" component={ProfileScreen}
