@@ -24,9 +24,10 @@ type CategoriesProps = {
   activeCategory: string;
   setActiveCategory: (category: string) => void;
   setActiveFavorite: (favorite: boolean) => void;
+  setSearchKeyword: (keyword: string) => void;
 };
 
-export default function Categories({activeCategory,setActiveCategory,setActiveFavorite}:CategoriesProps) {
+export default function Categories({activeCategory,setActiveCategory,setActiveFavorite,setSearchKeyword}:CategoriesProps) {
     return (
         <Animated.View entering={FadeInDown.duration(500).springify()}>
             <ScrollView
@@ -39,6 +40,7 @@ export default function Categories({activeCategory,setActiveCategory,setActiveFa
                     return (
                         <TouchableOpacity key={index}
                             onPress={()=>{
+                                setSearchKeyword("");
                                 setActiveFavorite(false);
                                 setActiveCategory(cat.name)}
                             }

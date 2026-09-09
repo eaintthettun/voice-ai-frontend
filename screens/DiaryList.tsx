@@ -42,6 +42,7 @@ const DiaryList = () => {
     useNavigation<NavigationProp<RootStackParamList>>();
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [activeFavorite, setActiveFavorite] = useState<boolean>(false);
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
 
   useEffect(() => {
     const fetchDiaryEntriesByCategory = async (category: string) => {
@@ -74,15 +75,28 @@ const DiaryList = () => {
       }
     }
 
-    //only call one api at a time
-    //when activeFavorite=true, call favorite diary entries api
-    //otherwise, call categorywise api
-    if (activeFavorite) {
+    const fetchSearchDiaryEntries = async (searchKeyword: string) => {
+      try {
+        const data = await diaryEntryService.searchDiaryEntries(searchKeyword);
+        setDiaryEntries(data.diaryEntries);
+      } catch (error) {
+        console.error("Failed to fetch search diary entries:", error);
+      } finally {
+        setLoadingIcon(false);
+      }
+    }
+
+    //only call one api at a time(search->favorite->category)
+    if (searchKeyword.trim()) {
+      fetchSearchDiaryEntries(searchKeyword);
+    } else if (activeFavorite) {
       fetchFavoriteDiaryEntries();
-    } else {
+    } 
+    //when there is active category
+    else {
       fetchDiaryEntriesByCategory(activeCategory);
     }
-  }, [activeCategory, activeFavorite]);
+  }, [activeCategory, activeFavorite, searchKeyword]);
 
   const handleLongPress = (item: DiaryEntry) => {
     Alert.alert(
@@ -134,8 +148,6 @@ const DiaryList = () => {
     return <LoadingScreen />;
   }
 
-  console.log("Diary Entries:", diaryEntries);
-
   return (
     <View className="flex-1">
       <View style={{ paddingTop: top }} className="flex-row items-center bg-sky-600 rounded-b-3xl p-3">
@@ -149,7 +161,7 @@ const DiaryList = () => {
           </TouchableOpacity>
         </View>
         <View className="flex-1 items-center">
-          <Text className={`text-white text-2xl font-bold text-center`}>
+          <Text className={`text-white text-xl font-bold text-center`}>
             Diary List
           </Text>
         </View>
@@ -162,7 +174,9 @@ const DiaryList = () => {
           placeholder="Search any diary entry..."
           placeholderTextColor={'gray'}
           style={{ fontSize: hp(1.7) }}
-          className="flex-1 mb-1 pl-3 tracking-wider">
+          className="flex-1 mb-1 pl-3 tracking-wider"
+          onChangeText={setSearchKeyword}
+          value={searchKeyword}>
         </TextInput>
         <View className="bg-white rounded-full p-3">
           <Feather name="search" color="#000" size={24} />
@@ -171,7 +185,9 @@ const DiaryList = () => {
       {/* Horizontal scroll bar for categories */}
       <View className="flex-row">
         <Categories activeCategory={activeCategory}
-          setActiveCategory={setActiveCategory} setActiveFavorite={setActiveFavorite} />
+          setActiveCategory={setActiveCategory} 
+          setActiveFavorite={setActiveFavorite}
+          setSearchKeyword={setSearchKeyword} />
         {/* isFavorite button */}
         <Animated.View
           entering={FadeInDown.duration(500).springify()}
@@ -180,6 +196,7 @@ const DiaryList = () => {
             className={`rounded-full p-[13px] ${activeFavorite ? "bg-amber-300" : "bg-blue-100"
               }`}
             onPress={() => {
+              setSearchKeyword("");
               setActiveFavorite(true);
               setActiveCategory("");
             }}>
@@ -241,8 +258,8 @@ const DiaryList = () => {
                   </TouchableOpacity>
                 )
               }
-            }/>
-          ):
+            } />
+        ) :
           (<NoData />)
       }
     </View>

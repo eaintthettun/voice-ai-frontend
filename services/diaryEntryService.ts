@@ -1,6 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 
-const API_URL = "http://192.168.37.105:3000";
+const API_URL = "http://192.168.1.6:3000";
 
 const getAllDiaryEntries = async () => {
   const token = await SecureStore.getItemAsync("token");
@@ -14,7 +14,6 @@ const getAllDiaryEntries = async () => {
     {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     }
@@ -41,7 +40,6 @@ const getRecentDiaryEntries = async () => {
     {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     }
@@ -129,7 +127,7 @@ const createDiaryEntry = async (
   return data;
 };
 
-const deleteDiaryEntry = async (id:string) => {
+const deleteDiaryEntry = async (id: string) => {
   const token = await SecureStore.getItemAsync("token");
 
   if (!token) {
@@ -157,7 +155,7 @@ const deleteDiaryEntry = async (id:string) => {
 };
 
 const updateDiaryEntry = async (
-  id:string,
+  id: string,
   title: string,
   transcript: string,
 ) => {
@@ -189,7 +187,7 @@ const updateDiaryEntry = async (
   return data;
 };
 
-const getDiaryEntryDetail = async (id:string) => {
+const getDiaryEntryDetail = async (id: string) => {
   const token = await SecureStore.getItemAsync("token");
 
   if (!token) {
@@ -201,7 +199,6 @@ const getDiaryEntryDetail = async (id:string) => {
     {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     }
@@ -228,7 +225,6 @@ const getDiaryEntriesByCategory = async (category: string) => {
     {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     }
@@ -255,7 +251,6 @@ const getFavoriteDiaryEntries = async () => {
     {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     }
@@ -270,6 +265,32 @@ const getFavoriteDiaryEntries = async () => {
   return data;
 }
 
+const searchDiaryEntries = async (keyword:string) => {
+  const token = await SecureStore.getItemAsync("token");
+
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+
+  const response = await fetch(
+    `${API_URL}/api/diaryEntries/search?keyword=${encodeURIComponent(keyword)}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch search diary entries");
+  }
+
+  return data;
+}
+
 export default {
   getAllDiaryEntries,
   getRecentDiaryEntries,
@@ -279,5 +300,6 @@ export default {
   updateDiaryEntry,
   getDiaryEntryDetail,
   getDiaryEntriesByCategory,
-  getFavoriteDiaryEntries
+  getFavoriteDiaryEntries,
+  searchDiaryEntries
 };
