@@ -1,16 +1,25 @@
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
+import { RouteProp, useNavigation, useRoute, NavigationProp } from "@react-navigation/native";
 import { useEffect, useState } from "react"
 import diaryEntryService from "../services/diaryEntryService";
-import { Image, Text, TouchableOpacity, View } from "react-native"
+import { Alert, Image, Text, TouchableOpacity, View } from "react-native"
 import { colors } from "../theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-//this is how we define props when working with react navigation
+
 type RootStackParamList = {
+    //for accepting props
     DiaryDetail: {
         id: string;
     };
+    //for navigation
+    EditDiary: {
+        id: string;
+        title: string;
+        transcript: string;
+        category: string;
+    };
+    DiaryList: undefined;
 };
 
 type DiaryRouteProp = RouteProp<
@@ -32,12 +41,12 @@ export const DiaryEntryDetailScreen = () => {
     const [audio, setAudio] = useState("");
     const [transcript, setTranscript] = useState("");
     const [createdAt, setCreatedAt] = useState("");
-    const navigation = useNavigation()
+    const navigation =
+        useNavigation<NavigationProp<RootStackParamList>>();
 
     useEffect(() => {
         const fetchDiaryEntry = async () => {
             const result = await diaryEntryService.getDiaryEntryDetail(id);
-            console.log('result:', result)
 
             if (result.message === "Diary entry detail get successfully") {
                 setTitle(result.diaryEntry.title);
@@ -48,14 +57,44 @@ export const DiaryEntryDetailScreen = () => {
             }
         }
         fetchDiaryEntry();
-    });
+    }, [id]);
 
-    const handleEdit = (id: string) => {
-        //navigation.navigate("EditDiary", { id })
+    const handleEdit = () => {
+        navigation.navigate("EditDiary", {
+            id,
+            title,
+            transcript,
+            category,
+        });
     }
 
-    const handleDelete = (id: string) => {
+    const handleDelete = async () => {
+        try {
+            await diaryEntryService.deleteDiaryEntry(id);
 
+            Alert.alert("Success", "Diary deleted.");
+            navigation.navigate("DiaryList");
+        } catch (error) {
+            Alert.alert("Error", "Failed to delete diary.");
+        }
+    }
+
+    const showDeleteAlert = () => {
+        Alert.alert(
+            title,
+            "Are you sure you want to delete this diary entry?",
+            [
+                {
+                    text: "Delete",
+                    style: "destructive",
+                    onPress: () => handleDelete(),
+                },
+                {
+                    text: "Cancel",
+                    style: "cancel",
+                },
+            ]
+        );
     }
 
 
@@ -63,18 +102,18 @@ export const DiaryEntryDetailScreen = () => {
     return (
         <View className="flex -1">
             <View style={{ paddingTop: top }} className="flex-row justify-between bg-sky-600 rounded-b-3xl p-3">
-                <TouchableOpacity className="mt-4 "onPress={() => navigation.goBack()}>
+                <TouchableOpacity className="mt-4 " onPress={() => navigation.goBack()}>
                     <Ionicons
                         name="arrow-back"
                         size={20}
                         color="#ffffff"
                     />
                 </TouchableOpacity>
-                <Text className={`text-white text-2xl font-bold text-center mt-3`}>
+                <Text className={`text-white text-xl font-bold text-center mt-3`}>
                     {title}
                 </Text>
                 <View>
-                    <TouchableOpacity className="mt-4 "onPress={() => setMenuVisible(!menuVisible)}>
+                    <TouchableOpacity className="mt-4 " onPress={() => setMenuVisible(!menuVisible)}>
                         <Ionicons
                             name="ellipsis-vertical"
                             size={20}
@@ -86,14 +125,14 @@ export const DiaryEntryDetailScreen = () => {
                         <View className="absolute right-0 top-12 bg-white rounded-xl shadow-lg w-32">
                             <TouchableOpacity
                                 className="px-4 py-3"
-                                onPress={() => handleEdit(id)}
+                                onPress={handleEdit}
                             >
                                 <Text className="text-base">Edit</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
                                 className="px-4 py-3"
-                                onPress={() => handleDelete(id)}
+                                onPress={showDeleteAlert}
                             >
                                 <Text className="text-base text-red-500">Delete</Text>
                             </TouchableOpacity>

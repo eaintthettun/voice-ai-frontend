@@ -6,19 +6,21 @@ import diaryEntryService from "../services/diaryEntryService";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
-
 type RootStackParamList = {
+    //for accepting props
     EditDiary: {
         id: string;
         title: string;
         transcript: string;
         category: string;
     };
+    //for navigation
     DiaryDetail: {
         id: string
     }
 };
 
+//for props access, we need to define the type of the route prop
 type EditDiaryRouteProp = RouteProp<
     RootStackParamList,
     "EditDiary"
@@ -35,9 +37,6 @@ export default function EditNoteScreen() {
         transcript,
         category,
     } = route.params;
-
-    console.log("id in edit screen:", id)
-
 
     const [editedTranscript, setEditedTranscript] = useState(transcript);
     const [editedCategory, setEditedCategory] = useState(category);
@@ -66,7 +65,7 @@ export default function EditNoteScreen() {
                     </TouchableOpacity>
                 </View>
                 <View className="flex-1 text-center">
-                    <Text className={`text-white text-2xl font-bold text-center mb-4`}>
+                    <Text className={`text-white text-xl font-bold text-center mb-4`}>
                         Edit Diary
                     </Text>
                 </View>
