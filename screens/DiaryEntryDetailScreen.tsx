@@ -1,10 +1,11 @@
 import { RouteProp, useNavigation, useRoute, NavigationProp } from "@react-navigation/native";
 import { useEffect, useState } from "react"
-import diaryEntryService from "../services/diaryEntryService";
+import diaryEntryService, { API_URL } from "../services/diaryEntryService";
 import { Alert, Image, Text, TouchableOpacity, View } from "react-native"
 import { colors } from "../theme";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AudioPreview } from "../components/AudioPreview";
 
 
 type RootStackParamList = {
@@ -18,6 +19,8 @@ type RootStackParamList = {
         title: string;
         transcript: string;
         category: string;
+        audio:string;
+        createdAt: string;
     };
     DiaryList: undefined;
 };
@@ -38,11 +41,15 @@ export const DiaryEntryDetailScreen = () => {
 
     const [category, setCategory] = useState("");
     const [title, setTitle] = useState("");
-    const [audio, setAudio] = useState("");
     const [transcript, setTranscript] = useState("");
     const [createdAt, setCreatedAt] = useState("");
     const navigation =
         useNavigation<NavigationProp<RootStackParamList>>();
+    const [audio, setAudio] = useState("");
+    const audioUrl = audio
+        ? `${API_URL}/${audio.replace(/\\/g, "/")}`
+        : "";
+
 
     useEffect(() => {
         const fetchDiaryEntry = async () => {
@@ -65,6 +72,8 @@ export const DiaryEntryDetailScreen = () => {
             title,
             transcript,
             category,
+            audio,
+            createdAt
         });
     }
 
@@ -96,8 +105,6 @@ export const DiaryEntryDetailScreen = () => {
             ]
         );
     }
-
-
 
     return (
         <View className="flex -1">
@@ -155,7 +162,7 @@ export const DiaryEntryDetailScreen = () => {
                     {category}
                 </Text>
             </View>
-            <View className="mb-5">
+            <View>
                 <Text className={`${colors.heading} text-base font-semibold mb-2 mx-2`}>
                     Transcript
                 </Text>
@@ -164,14 +171,12 @@ export const DiaryEntryDetailScreen = () => {
                     {transcript}
                 </Text>
             </View>
-            <View className="mb-5">
-                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-2`}>
-                    Audio
-                </Text>
-
-                <Text className="bg-gray-200 px-5 py-4 rounded-2xl mx-2">
-                    {audio}
-                </Text>
+            <View className="mb-5 mx-2">
+                {audioUrl && (
+                    <AudioPreview
+                        uri={audioUrl}
+                    />
+                )}
             </View>
             <View className="mb-5">
                 <Text className={`${colors.heading} text-base font-semibold mb-2 mx-2`}>

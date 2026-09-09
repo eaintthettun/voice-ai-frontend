@@ -1,10 +1,11 @@
-import { Alert, Image, Text, TextInput, TouchableOpacity, View } from "react-native"
+import { Alert, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native"
 import { colors } from "../theme";
 import { useState } from "react";
 import { NavigationProp, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import diaryEntryService from "../services/diaryEntryService";
+import diaryEntryService, { API_URL } from "../services/diaryEntryService";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { AudioPreview } from "../components/AudioPreview";
 
 type RootStackParamList = {
     //for accepting props
@@ -13,6 +14,8 @@ type RootStackParamList = {
         title: string;
         transcript: string;
         category: string;
+        audio: string;
+        createdAt: string;
     };
     //for navigation
     DiaryDetail: {
@@ -36,12 +39,16 @@ export default function EditNoteScreen() {
         title,
         transcript,
         category,
+        audio,
+        createdAt
     } = route.params;
 
     const [editedTranscript, setEditedTranscript] = useState(transcript);
-    const [editedCategory, setEditedCategory] = useState(category);
     const [editedTitle, setEditedTitle] = useState(title);
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const audioUrl = audio
+        ? `${API_URL}/${audio.replace(/\\/g, "/")}`
+        : "";
 
     const handleUpdate = async () => {
         const result = await diaryEntryService.updateDiaryEntry(id, editedTitle, editedTranscript)
@@ -53,7 +60,11 @@ export default function EditNoteScreen() {
     }
 
     return (
-        <View className="flex-1">
+        <ScrollView className="flex-1"
+            contentContainerStyle={{
+                paddingBottom: 30,
+            }}
+            showsVerticalScrollIndicator={false}>
             <View className="flex-row items-center bg-sky-600 rounded-3xl" style={{ paddingTop: top }}>
                 <View className="flex-1 mx-2"  >
                     <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -101,14 +112,39 @@ export default function EditNoteScreen() {
                     onChangeText={setEditedTranscript}
                 />
             </View>
-            <View className="mb-5 mx-2">
+            <View className="mx-2">
                 <Text className={`${colors.heading} text-base font-semibold mb-2`}>
                     Category
                 </Text>
 
                 <View className="bg-gray-200 px-5 py-4 rounded-2xl mx-2">
-                    <Text>{editedCategory}</Text>
+                    <Text>{category}</Text>
                 </View>
+
+            </View>
+            <View className="mb-5 mx-2">
+                {audioUrl && (
+                    <AudioPreview
+                        uri={audioUrl}
+                    />
+                )}
+            </View>
+            <View className="mb-5 mx-2">
+                <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+                    Created At
+                </Text>
+
+                <Text className="bg-gray-200 px-5 py-4 rounded-2xl mx-2">
+                    {createdAt
+                        ? new Date(createdAt).toLocaleString("en-US", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                        })
+                        : "Loading..."}
+                </Text>
 
             </View>
             <TouchableOpacity
@@ -119,6 +155,6 @@ export default function EditNoteScreen() {
                     Save Diary
                 </Text>
             </TouchableOpacity>
-        </View>
+        </ScrollView>
     )
 }

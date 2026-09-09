@@ -1,5 +1,6 @@
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { Button, Text, View, StyleSheet } from "react-native";
+import { colors } from "../theme";
 
 //this accepts uri as prop and play the file with the player
 export function AudioPreview({
@@ -7,7 +8,7 @@ export function AudioPreview({
   onDelete,
 }: {
   uri: string;
-  onDelete: () => void;
+  onDelete?: () => void;
 }) {
   const player = useAudioPlayer(uri);
   const status = useAudioPlayerStatus(player);
@@ -24,25 +25,27 @@ export function AudioPreview({
 
   return (
     <View style={styles.audioContainer}>
-      <Text>Recording ready</Text>
+      <Text className={`${colors.heading} text-base font-semibold mx-2`}>Recording</Text>
 
       <Button
         title={status.playing ? "Pause" : "Play"}
         onPress={togglePlay}
       />
 
-      <Button
-        title="Delete"
-        onPress={onDelete}
-        color="red"
-      />
+      {onDelete && (
+        <Button
+          title="Delete"
+          onPress={onDelete}
+          color="red"
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
     audioContainer: {
-    marginTop: 30,
+    marginTop: 20,
     gap: 10,
   },
 })

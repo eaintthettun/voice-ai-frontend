@@ -18,6 +18,8 @@ type RootStackParamList = {
     title: string;
     transcript: string;
     category: string;
+    audio:string;
+    createdAt: string;
   };
 
   DiaryDetail: {

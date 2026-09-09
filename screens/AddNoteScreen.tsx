@@ -13,6 +13,7 @@ import { useState } from "react";
 import diaryEntryService from "../services/diaryEntryService";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 
 type RootStackParamList = {
   DiaryList: undefined;
@@ -24,7 +25,7 @@ export default function AddNoteScreen() {
   const [title, setTitle] = useState("");
   const [audioUri, setAudioUri] = useState("");
   const [filePath, setFilePath] = useState("");
-  const [isTranscribing,setIsTranscribing]=useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
   const { top } = useSafeAreaInsets();
 
   const navigation =
@@ -75,14 +76,13 @@ export default function AddNoteScreen() {
       }}
       showsVerticalScrollIndicator={false}
     >
-
       {/* Header */}
-      <Text
-        style={{paddingTop:top}} 
-        className={`text-white p-4 text-2xl font-bold text-center mb-4 bg-sky-600 rounded-3xl`}
-      >
-        Add Diary Entry
-      </Text>
+        <Text
+          style={{ paddingTop: top }}
+          className="text-white  bg-sky-600 rounded-b-3xl text-xl font-bold text-center p-3"
+        >
+          Add Diary
+        </Text>
 
       {/* Illustration */}
       <View className="items-center mb-4">
@@ -109,7 +109,7 @@ export default function AddNoteScreen() {
       {/* Recording */}
       <View className="mb-5">
         <Text className={`${colors.heading} text-base font-semibold mb-2 mx-4`}>
-          Recording
+          Audio
         </Text>
 
         <View className="bg-white rounded-2xl border border-gray-200 p-3 mx-4">
