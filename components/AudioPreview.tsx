@@ -1,8 +1,11 @@
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
-import { Button, Text, View, StyleSheet } from "react-native";
+import { Button, Text, View, TouchableOpacity } from "react-native";
 import { colors } from "../theme";
+import Slider from "@react-native-community/slider";
+import Feather from 'react-native-vector-icons/Feather';
+import Octicons from 'react-native-vector-icons/Octicons';
 
-//this accepts uri as prop and play the file with the player
+// this accepts uri as prop and plays the file with the player
 export function AudioPreview({
   uri,
   onDelete,
@@ -21,31 +24,54 @@ export function AudioPreview({
     }
   };
 
-  console.log("AudioPreview render. Player state:", status.playing);
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
 
   return (
-    <View style={styles.audioContainer}>
-      <Text className={`${colors.heading} text-base font-semibold mx-2`}>Recording</Text>
+    <View >
+      {/* play,pause button and slider */}
+      <View className="flex-row items-center mx-4">
+        <TouchableOpacity onPress={togglePlay}  >
+          {status.playing ? (
+            <Feather name="pause-circle" color="#050505" size={30} />
+          ) : (
+            <Octicons name="play" color="#050505" size={30} />
+          )}
+        </TouchableOpacity>
 
-      <Button
-        title={status.playing ? "Pause" : "Play"}
-        onPress={togglePlay}
-      />
+        <Text className="w-10 ml-3">
+          {formatTime(status.currentTime)}
+        </Text>
+
+        <View className="flex-1">
+          <Slider
+            minimumValue={0}
+            maximumValue={status.duration || 1}
+            value={status.currentTime}
+            onSlidingComplete={(value) => {
+              player.seekTo(value);
+            }}
+          />
+        </View>
+
+        <Text className="w-10 text-right">
+          {formatTime(status.duration)}
+        </Text>
+      </View>
 
       {onDelete && (
-        <Button
+        <View className="mx-4 mt-3">
+          <Button
           title="Delete"
           onPress={onDelete}
           color="red"
-        />
+          />
+        </View>
       )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-    audioContainer: {
-    marginTop: 20,
-    gap: 10,
-  },
-})

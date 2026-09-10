@@ -88,10 +88,15 @@ export default function RecordAudioButton({
       </TouchableOpacity>
 
       {audioUri && (
-        <AudioPreview
-          uri={audioUri}
-          onDelete={deleteRecording}
-        />
+        <View>
+          <Text className=" text-neutral-600 text-base font-semibold my-4 mx-4">
+            Recording ready
+          </Text>
+          <AudioPreview
+            uri={audioUri}
+            onDelete={deleteRecording}
+          />
+        </View>
       )}
     </View>
   );

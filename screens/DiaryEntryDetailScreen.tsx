@@ -154,36 +154,29 @@ export const DiaryEntryDetailScreen = () => {
                 />
             </View>
             <View className="mb-5">
-                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-2`}>
+                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-4`}>
                     Category
                 </Text>
 
-                <Text className="bg-white px-5 py-4 rounded-2xl border border-gray-200 mx-2">
+                <Text className="bg-white px-5 py-4 rounded-2xl border border-gray-200 mx-4">
                     {category}
                 </Text>
             </View>
-            <View>
-                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-2`}>
+            <View className="mb-5">
+                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-4`}>
                     Transcript
                 </Text>
 
-                <Text className="bg-white px-5 py-4 rounded-2xl border border-gray-200 mx-2">
+                <Text className="bg-white px-5 py-4 rounded-2xl border border-gray-200 mx-4">
                     {transcript}
                 </Text>
             </View>
-            <View className="mb-5 mx-2">
-                {audioUrl && (
-                    <AudioPreview
-                        uri={audioUrl}
-                    />
-                )}
-            </View>
             <View className="mb-5">
-                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-2`}>
+                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-4`}>
                     Created At
                 </Text>
 
-                <Text className="bg-white px-5 py-4 rounded-2xl border border-gray-200 mx-2">
+                <Text className="bg-white px-5 py-4 rounded-2xl border border-gray-200 mx-4">
                     {createdAt
                         ? new Date(createdAt).toLocaleString("en-US", {
                             day: "numeric",
@@ -194,6 +187,16 @@ export const DiaryEntryDetailScreen = () => {
                         })
                         : "Loading..."}
                 </Text>
+            </View>
+            <View className="mb-5">
+                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-4`}>
+                    Audio
+                </Text>
+                {audioUrl && (
+                    <AudioPreview
+                        uri={audioUrl}
+                    />
+                )}
             </View>
         </View>
     )

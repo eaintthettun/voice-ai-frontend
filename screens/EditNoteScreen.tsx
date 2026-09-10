@@ -89,52 +89,45 @@ export default function EditNoteScreen() {
                 />
             </View>
             <View className="mb-5">
-                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-2`}>
+                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-4`}>
                     Title
                 </Text>
 
                 <TextInput
-                    className="bg-white px-5 py-4 rounded-2xl border border-gray-200 mx-2"
+                    className="bg-white px-5 py-4 rounded-2xl border border-gray-200 mx-4"
                     placeholder="Enter diary title..."
                     value={editedTitle}
                     onChangeText={setEditedTitle}
                 />
             </View>
-            <View className="mb-5 mx-2">
-                <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+            <View className="mb-5">
+                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-4`}>
                     Transcript
                 </Text>
 
                 <TextInput
-                    className="bg-white px-5 py-5 rounded-2xl border border-gray-200 mx-2"
+                    className="bg-white px-5 py-5 rounded-2xl border border-gray-200 mx-4"
                     placeholder="Enter diary transcript..."
                     value={editedTranscript}
                     onChangeText={setEditedTranscript}
                 />
             </View>
-            <View className="mx-2">
-                <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+            <View className="mb-5">
+                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-4`}>
                     Category
                 </Text>
 
-                <View className="bg-gray-200 px-5 py-4 rounded-2xl mx-2">
+                <View className="bg-gray-200 px-5 py-4 rounded-2xl mx-4">
                     <Text>{category}</Text>
                 </View>
 
             </View>
-            <View className="mb-5 mx-2">
-                {audioUrl && (
-                    <AudioPreview
-                        uri={audioUrl}
-                    />
-                )}
-            </View>
-            <View className="mb-5 mx-2">
-                <Text className={`${colors.heading} text-base font-semibold mb-2`}>
+            <View className="mb-5">
+                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-4`}>
                     Created At
                 </Text>
 
-                <Text className="bg-gray-200 px-5 py-4 rounded-2xl mx-2">
+                <Text className="bg-gray-200 px-5 py-4 rounded-2xl mx-4">
                     {createdAt
                         ? new Date(createdAt).toLocaleString("en-US", {
                             day: "numeric",
@@ -145,7 +138,16 @@ export default function EditNoteScreen() {
                         })
                         : "Loading..."}
                 </Text>
-
+            </View>
+            <View className="mb-5">
+                <Text className={`${colors.heading} text-base font-semibold mb-2 mx-4`}>
+                    Audio
+                </Text>
+                {audioUrl && (
+                    <AudioPreview
+                        uri={audioUrl}
+                    />
+                )}
             </View>
             <TouchableOpacity
                 className="bg-blue-600 py-4 rounded-2xl mx-2"
