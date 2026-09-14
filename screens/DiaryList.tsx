@@ -10,7 +10,7 @@ import Categories from "../components/Categories";
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { NoData } from "../components/NoData";
-
+import MasonryList from "@react-native-seoul/masonry-list";
 
 interface DiaryEntry {
   id: string;
@@ -21,6 +21,7 @@ interface DiaryEntry {
 }
 
 type RootStackParamList = {
+  //for navigation
   EditDiary: {
     id: string;
     title: string;
@@ -29,7 +30,8 @@ type RootStackParamList = {
   };
   DiaryDetail: {
     id: string
-  }
+  },
+  AddDiary: undefined;
 };
 
 
@@ -91,7 +93,7 @@ const DiaryList = () => {
       fetchSearchDiaryEntries(searchKeyword);
     } else if (activeFavorite) {
       fetchFavoriteDiaryEntries();
-    } 
+    }
     //when there is active category
     else {
       fetchDiaryEntriesByCategory(activeCategory);
@@ -149,7 +151,8 @@ const DiaryList = () => {
   }
 
   return (
-    <View className="flex-1">
+    <View className="flex-1 pb-10">
+      {/* title and back arrow */}
       <View style={{ paddingTop: top }} className="flex-row items-center bg-sky-600 rounded-b-3xl p-3">
         <View className="flex-1">
           <TouchableOpacity className="mt-4 " onPress={() => navigation.goBack()}>
@@ -183,9 +186,9 @@ const DiaryList = () => {
         </View>
       </View>
       {/* Horizontal scroll bar for categories */}
-      <View className="flex-row">
+      <View className="flex-row mb-2">
         <Categories activeCategory={activeCategory}
-          setActiveCategory={setActiveCategory} 
+          setActiveCategory={setActiveCategory}
           setActiveFavorite={setActiveFavorite}
           setSearchKeyword={setSearchKeyword} />
         {/* isFavorite button */}
@@ -214,51 +217,36 @@ const DiaryList = () => {
       }
       {
         diaryEntries.length > 0 ? (
-          <FlatList
-            data={diaryEntries}
-            numColumns={1}
-            keyExtractor={item => item.id}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 30 }}
-            renderItem={
-              ({ item }) => {
-                return (
-                  <TouchableOpacity
-                    className="bg-blue-100 m-4 rounded-xl shadow-md"
-                    onLongPress={() => handleLongPress(item)}
-                    onPress={() => navigation.navigate("DiaryDetail", { id: item.id })}>
-                    <View className="flex-row items-center p-3">
-                      {/* Diary information */}
-                      <View className="flex-1 gap-2">
-                        <Text className="font-bold text-lg">
-                          {item.title}
-                        </Text>
+          <View className="flex-1">
+            <View className="flex-1 px-2">
+              <MasonryList
+                data={diaryEntries}
+                keyExtractor={(item) => item.id}
+                numColumns={2}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item, i }) => (
+                  <DiaryCard
+                    diary={item as DiaryEntry}
+                    i={i}
+                    handleLongPress={handleLongPress}
+                    navigation={navigation}
+                  />
+                )}
+                onEndReachedThreshold={0.1}
+              />
+            </View>
 
-                        <Text numberOfLines={2}>
-                          Transcript: {item.transcript}
-                        </Text>
-
-                        <Text className="text-gray-500 text-sm">
-                          Category: {item.category}
-                        </Text>
-
-                        <Text className="text-gray-500 text-sm">
-                          Date: {new Date(item.createdAt).toDateString()}
-                        </Text>
-                      </View>
-
-                      {/* Arrow */}
-                      <Ionicons
-                        name="chevron-forward"
-                        size={24}
-                        color="#0ea5e9"
-                      />
-
-                    </View>
-                  </TouchableOpacity>
-                )
-              }
-            } />
+            {/* Floating Plus Button */}
+            <TouchableOpacity
+              className="absolute bottom-10 right-10 w-16 h-16 rounded-full items-center justify-center shadow-lg"
+              style={{ backgroundColor: "#0ea5e9" }}
+              onPress={() => {
+                navigation.navigate("AddDiary");
+              }}
+            >
+              <Text className="text-white text-5xl font-medium">+</Text>
+            </TouchableOpacity>
+          </View>
         ) :
           (<NoData />)
       }
@@ -267,3 +255,68 @@ const DiaryList = () => {
 };
 
 export default DiaryList;
+
+type DiaryCardProps = {
+  diary: DiaryEntry;
+  i: number;
+  handleLongPress: (diary: DiaryEntry) => void;
+  navigation: NavigationProp<RootStackParamList>;
+};
+
+
+const DiaryCard = ({
+  diary,
+  i,
+  handleLongPress,
+  navigation,
+}: DiaryCardProps) => {
+  //height based on the length of the transcript
+  const transcriptLength = diary.transcript.length;
+
+  let cardHeight = hp(20); // default height
+
+  if (transcriptLength >= 40) {
+    cardHeight = hp(25);
+  }
+
+  return (
+    <TouchableOpacity
+      className="bg-gray-200 rounded-xl shadow-sm m-2"
+      onLongPress={() => handleLongPress(diary)}
+      onPress={() =>
+        navigation.navigate("DiaryDetail", {
+          id: diary.id,
+        })
+      }
+    >
+      <View
+        style={{
+          padding: 16,
+          height: cardHeight
+        }}
+        className="flex justify-center"
+      >
+        <Text className="font-bold text-lg">
+          {diary.title}
+        </Text>
+
+        <Text
+          className="mt-2"
+          numberOfLines={3}
+          ellipsizeMode="tail"
+        >
+          Transcript: {diary.transcript}
+        </Text>
+
+        <Text className="text-gray-500 text-sm mt-4">
+          Category: {diary.category}
+        </Text>
+
+        <Text className="text-gray-500 text-sm mt-1">
+          Date: {new Date(diary.createdAt).toDateString()}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+

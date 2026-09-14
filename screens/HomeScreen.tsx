@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import diaryEntryService from "../services/diaryEntryService";
 import { useAuth } from "../context/AuthContext";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 
 interface DiaryEntry {
   id: string;

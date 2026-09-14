@@ -8,11 +8,13 @@ import { useAuth } from "../context/AuthContext";
 import DiaryList from "../screens/DiaryList";
 import EditNoteScreen from "../screens/EditNoteScreen";
 import { DiaryEntryDetailScreen } from "../screens/DiaryEntryDetailScreen";
+import AddNoteScreen from "../screens/AddNoteScreen";
 
 type RootStackParamList = {
   Main: undefined;
   DiaryList: undefined;
 
+  AddDiary:undefined;
   EditDiary: {
     id: string;
     title: string;
@@ -47,6 +49,7 @@ export default function RootNavigator() {
           <Stack.Screen name="DiaryList" component={DiaryList} />
           <Stack.Screen name="EditDiary" component={EditNoteScreen} />
           <Stack.Screen name="DiaryDetail" component={DiaryEntryDetailScreen} />
+          <Stack.Screen name="AddDiary" component={AddNoteScreen} />
         </>
       ) : (
         <>
