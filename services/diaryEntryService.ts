@@ -1,6 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 
-export const API_URL = "http://192.168.1.4:3000";
+export const API_URL = "http://192.168.1.6:3000";
 
 const getAllDiaryEntries = async () => {
   const token = await SecureStore.getItemAsync("token");
@@ -291,6 +291,32 @@ const searchDiaryEntries = async (keyword:string) => {
   return data;
 }
 
+const getCurrentWeekData = async () => {
+  const token = await SecureStore.getItemAsync("token");
+
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+
+  const response = await fetch(
+    `${API_URL}/api/diaryEntries/statistics/current-week-activity-trend`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch current week data");
+  }
+
+  return data;
+}
+
 export default {
   getAllDiaryEntries,
   getRecentDiaryEntries,
@@ -301,5 +327,6 @@ export default {
   getDiaryEntryDetail,
   getDiaryEntriesByCategory,
   getFavoriteDiaryEntries,
-  searchDiaryEntries
+  searchDiaryEntries,
+  getCurrentWeekData
 };

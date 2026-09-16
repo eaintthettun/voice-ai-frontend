@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, FlatList, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, FlatList, Image, Modal, ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
 import LoadingScreen from "./LoadingScreen";
 import diaryEntryService from "../services/diaryEntryService";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
@@ -88,10 +88,12 @@ const DiaryList = () => {
       }
     }
 
-    //only call one api at a time(search->favorite->category)
+
+    //only call one api at a time(search->date->favorite->category)
     if (searchKeyword.trim()) {
       fetchSearchDiaryEntries(searchKeyword);
-    } else if (activeFavorite) {
+    }
+    else if (activeFavorite) {
       fetchFavoriteDiaryEntries();
     }
     //when there is active category
@@ -172,7 +174,8 @@ const DiaryList = () => {
         </View>
       </View>
       {/* Search bar */}
-      <View className="mx-2 mt-2 flex-row items-center rounded-full bg-black/5 p-[6px]">
+      <View className="flex-row items-center rounded-full bg-black/5 p-[3px]"
+        style={{ width: "85%" }}>
         <TextInput
           placeholder="Search any diary entry..."
           placeholderTextColor={'gray'}
@@ -185,6 +188,7 @@ const DiaryList = () => {
           <Feather name="search" color="#000" size={24} />
         </View>
       </View>
+
       {/* Horizontal scroll bar for categories */}
       <View className="flex-row mb-2">
         <Categories activeCategory={activeCategory}
@@ -250,6 +254,7 @@ const DiaryList = () => {
         ) :
           (<NoData />)
       }
+
     </View>
   );
 };

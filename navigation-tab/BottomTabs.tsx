@@ -2,11 +2,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import HomeScreen from "../screens/HomeScreen";
 import AddNoteScreen from "../screens/AddNoteScreen";
-import CategoriesScreen from "../screens/CategoriesScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import { Ionicons } from "@expo/vector-icons";
 import DiaryList from "../screens/DiaryList";
 import Feather from 'react-native-vector-icons/Feather';
+import AnalyticsScreen from "../screens/AnalyticsScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -40,7 +40,7 @@ export default function BottomTabs() {
             />
           ),
         }} />
-      <Tab.Screen name="Report" component={CategoriesScreen}
+      <Tab.Screen name="Analytics" component={AnalyticsScreen}
         options={{
           tabBarIcon: ({ color, size }) => (
              <Feather name="pie-chart" color={color} size={size} />
