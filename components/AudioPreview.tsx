@@ -1,6 +1,5 @@
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { Button, Text, View, TouchableOpacity } from "react-native";
-import { colors } from "../theme";
 import Slider from "@react-native-community/slider";
 import Feather from 'react-native-vector-icons/Feather';
 import Octicons from 'react-native-vector-icons/Octicons';

@@ -19,7 +19,7 @@ type RootStackParamList = {
         title: string;
         transcript: string;
         category: string;
-        audio:string;
+        audio: string;
         createdAt: string;
     };
     DiaryList: undefined;
@@ -49,6 +49,7 @@ export const DiaryEntryDetailScreen = () => {
     const audioUrl = audio
         ? `${API_URL}/${audio.replace(/\\/g, "/")}`
         : "";
+    const [favorite, setFavorite] = useState(false);
 
 
     useEffect(() => {
@@ -61,10 +62,25 @@ export const DiaryEntryDetailScreen = () => {
                 setCategory(result.diaryEntry.category);
                 setAudio(result.diaryEntry.filePath);
                 setCreatedAt(result.diaryEntry.createdAt);
+                setFavorite(result.diaryEntry.isFavorite);
             }
         }
+
+
         fetchDiaryEntry();
     }, [id]);
+
+    const handleToggleFavorite = async () => {
+        try {
+            const data = await diaryEntryService.toggleFavorite(id);
+
+            if (data.message === "Favorite status toggled successfully") {
+                setFavorite(data.result.isFavorite);
+            }
+        } catch (error) {
+            Alert.alert("Error", "Failed to update favorite status.");
+        }
+    };
 
     const handleEdit = () => {
         navigation.navigate("EditDiary", {
@@ -146,6 +162,16 @@ export const DiaryEntryDetailScreen = () => {
                         </View>
                     )}
                 </View>
+            </View>
+            {/* mark as favorite button */}
+            <View className="flex-row justify-end mr-4">
+                <TouchableOpacity className="mt-4 " onPress={handleToggleFavorite}>
+                    <Ionicons
+                        name={favorite ? "heart" : "heart-outline"}
+                        size={30}
+                        color="#e72517"
+                    />
+                </TouchableOpacity>
             </View>
             <View className="items-center mb-4">
                 <Image

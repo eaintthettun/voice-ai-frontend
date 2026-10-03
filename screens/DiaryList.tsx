@@ -174,8 +174,7 @@ const DiaryList = () => {
         </View>
       </View>
       {/* Search bar */}
-      <View className="flex-row items-center rounded-full bg-black/5 p-[3px]"
-        style={{ width: "85%" }}>
+      <View className="flex-row items-center rounded-full bg-black/5 p-[3px] mt-2 mx-2">
         <TextInput
           placeholder="Search any diary entry..."
           placeholderTextColor={'gray'}

@@ -1,6 +1,6 @@
 import * as SecureStore from "expo-secure-store";
 
-export const API_URL = "http://192.168.1.6:3000";
+export const API_URL = "http://192.168.1.3:3000";
 
 const getAllDiaryEntries = async () => {
   const token = await SecureStore.getItemAsync("token");
@@ -291,7 +291,7 @@ const searchDiaryEntries = async (keyword:string) => {
   return data;
 }
 
-const getCurrentWeekData = async () => {
+const getCurrentWeekTrend = async () => {
   const token = await SecureStore.getItemAsync("token");
 
   if (!token) {
@@ -299,7 +299,7 @@ const getCurrentWeekData = async () => {
   }
 
   const response = await fetch(
-    `${API_URL}/api/diaryEntries/statistics/current-week-activity-trend`,
+    `${API_URL}/api/diaryEntries/statistics/current-week/trend`,
     {
       method: "GET",
       headers: {
@@ -311,7 +311,85 @@ const getCurrentWeekData = async () => {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Failed to fetch current week data");
+    throw new Error(data.message || "Failed to fetch current week trend");
+  }
+
+  return data;
+}
+
+const getCurrentWeekSummary = async () => {
+  const token = await SecureStore.getItemAsync("token");
+
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+
+  const response = await fetch(
+    `${API_URL}/api/diaryEntries/statistics/current-week/summary`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch current week summary");
+  }
+
+  return data;
+}
+
+const getWeeklyComparisonForCurrentMonth = async () => {
+  const token = await SecureStore.getItemAsync("token");
+
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+
+  const response = await fetch(
+    `${API_URL}/api/diaryEntries/statistics/current-month/weekly-comparison`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch current month's weekly comparison");
+  }
+
+  return data;
+}
+
+const toggleFavorite = async (id: string) => {
+  const token = await SecureStore.getItemAsync("token");
+
+  if (!token) {
+    throw new Error("No authentication token found");
+  }
+
+  const response = await fetch(
+    `${API_URL}/api/diaryEntries/${id}/favorite`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to update favorite status");
   }
 
   return data;
@@ -328,5 +406,8 @@ export default {
   getDiaryEntriesByCategory,
   getFavoriteDiaryEntries,
   searchDiaryEntries,
-  getCurrentWeekData
+  getCurrentWeekTrend,
+  getCurrentWeekSummary,
+  getWeeklyComparisonForCurrentMonth,
+  toggleFavorite,
 };
